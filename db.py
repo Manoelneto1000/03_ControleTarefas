@@ -1,36 +1,30 @@
-import pyodbc
-import streamlit as st
+import pandas as pd
+import os
 
-# Função para conectar ao SQL Server
-def conectar_sql_server():
-    return pyodbc.connect(
-        'DRIVER={ODBC Driver 17 for SQL Server};'
-        'SERVER=(localdb)\MSSQLLocalDB;'  # Servidor Banco de Dados
-        'DATABASE=Tarefas;'       # Nome do Banco de Dados
-        'Trusted_Connection=yes;'       
-    )
+ARQUIVO_CSV = "tarefas.csv"
 
-# Função para inserir tarefa no Banco
+# Função para salvar uma nova tarefa no CSV
 def inserir_tarefa(descricao, responsavel, status, data_inicio, data_fim):
-    conn = conectar_sql_server()
-    cursor = conn.cursor()
-    cursor.execute("""
-        INSERT INTO Tarefas_ (descricao, responsavel, status, data_inicio, data_fim)
-        VALUES (?, ?, ?, ?, ?)
-    """, descricao, responsavel, status, data_inicio, data_fim)
-    conn.commit()
-    conn.close()
+    nova_tarefa = {
+        "descricao": descricao,
+        "responsavel": responsavel,
+        "status": status,
+        "data_inicio": data_inicio,
+        "data_fim": data_fim
+    }
 
-# Função para recuperar Dados Cadastrados na tabela
+    if os.path.exists(ARQUIVO_CSV):
+        df = pd.read_csv(ARQUIVO_CSV)
+        df = pd.concat([df, pd.DataFrame([nova_tarefa])], ignore_index=True)
+    else:
+        df = pd.DataFrame([nova_tarefa])
+    
+    df.to_csv(ARQUIVO_CSV, index=False)
+
+# Função para buscar as tarefas do CSV
 def buscar_tarefas():
-    conn = conectar_sql_server()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM Tarefas_")
-    
-    tarefas = cursor.fetchall()
-    colunas = [column[0] for column in cursor.description]
-    
-    conn.close()
-
-    tarefas_dict = [dict(zip(colunas, linha)) for linha in tarefas]
-    return tarefas_dict
+    if os.path.exists(ARQUIVO_CSV):
+        df = pd.read_csv(ARQUIVO_CSV)
+        return df.to_dict(orient="records")
+    else:
+        return []

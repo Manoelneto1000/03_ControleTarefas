@@ -2,12 +2,12 @@ import streamlit as st
 import datetime
 from db import inserir_tarefa
 
-#Página cadastrar Tarefa
-st.title("Cadastrar Tarefa")
+st.title("✏️ Cadastrar Tarefa")
+
 with st.form('add_task'):
     descricao = st.text_area("Descrição da tarefa:")
     responsavel = st.text_input("Responsável:")
-    status = st.selectbox("Status",('Aberto', 'Em andamento', 'Concluído'))
+    status = st.selectbox("Status", ('Aberto', 'Em andamento', 'Concluído'))
     col1, col2 = st.columns(2)
     with col1:
         data_inicio = st.date_input("Data Início", min_value=datetime.date.today())

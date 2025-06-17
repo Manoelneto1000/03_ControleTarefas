@@ -1,15 +1,17 @@
 import streamlit as st
-import pandas as pd
 from db import buscar_tarefas
 
-#Visualizar Tarefas
+st.title("📋 Visualizar Tarefas")
 
-#Recupera Dados do Banco
-df = pd.DataFrame(buscar_tarefas())
+tarefas = buscar_tarefas()
 
-st.title("Lista de Tarefas")
-st.subheader("Estatistica")
-st.write(df.describe())
-st.divider()
-st.subheader("Tabela")
-st.dataframe(df, hide_index="hidden")
+if tarefas:
+    for tarefa in tarefas:
+        with st.container():
+            st.subheader(f"📝 {tarefa['descricao']}")
+            st.write(f"👤 Responsável: {tarefa['responsavel']}")
+            st.write(f"📅 De {tarefa['data_inicio']} até {tarefa['data_fim']}")
+            st.write(f"📌 Status: {tarefa['status']}")
+            st.divider()
+else:
+    st.info("Nenhuma tarefa encontrada.")
